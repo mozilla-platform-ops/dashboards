@@ -1,0 +1,9 @@
+{
+  "config": {
+    "grafana": {
+      "url": "https://grafana.relops.mozops.net",
+      "username": "aerickson",
+      "password": "A62Qy/Ps749r}k{[3qU=H(CFFcBfLf"
+    }
+  }
+}
