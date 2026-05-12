@@ -27,6 +27,26 @@ https://github.com/esnet/gdg
 
 ```
 
+### RelSRE folder exports
+
+Use `dashboards/relsre/` as the tracked location for Yardstick RelSRE dashboards.
+This mirrors the existing `earthangel/gdg-based/dashboards/relops/` layout while
+keeping the older `yardstick/manual/` files as historical manual exports.
+
+After replacing `config/importer.yml` with the 1Password config, use GDG to
+download the RelSRE folder:
+
+```bash
+./run_gdg.sh backup dash download -f RelSRE
+```
+
+GDG writes dashboard JSON under the configured output path by Grafana folder.
+Keep the RelSRE exports in `dashboards/relsre/` when committing them to this
+repo. If the local GDG output path differs, copy the downloaded RelSRE dashboard
+JSON into `dashboards/relsre/` before committing.
+
+Do not run `clear` or delete dashboards as part of a backup/update PR.
+
 ### misc
 
 ```bash
