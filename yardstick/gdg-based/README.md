@@ -82,6 +82,32 @@ curl -s -b ~/Downloads/cookies.Mozilla.yardstick.txt \
 Yardstick rotates the session token aggressively; if you see
 `session.token.rotate`, re-export cookies before continuing.
 
+### Alert rule exports
+
+RelSRE alert rules live in the same Grafana folder as the dashboards they
+monitor (per [the SRE wiki guide](https://mozilla-hub.atlassian.net/wiki/spaces/SRE/pages/1695645862)).
+Backups are tracked alongside the dashboards under `alerts/`, mirroring the
+folder layout above:
+
+```
+yardstick/gdg-based/alerts/
+  relsre/                          # rules in the RelSRE root folder
+  fxci-cloud-workers/{azure,gcp}/  # (empty today)
+  fxci-hardware-workers/{linux,mac,windows}/  # (empty today)
+  relsre-development/              # (empty today)
+```
+
+Pull all rules in the RelSRE tree:
+
+```bash
+curl -s -b ~/Downloads/cookies.Mozilla.yardstick.txt \
+  "https://yardstick.mozilla.org/api/v1/provisioning/alert-rules" \
+  | jq '[.[] | select(.folderUID == "<FOLDER_UID>")]'
+```
+
+Save one JSON per rule (filename = title slug). Strip server-churn fields
+(`id`, `updated`, `version`) before committing so diffs stay clean.
+
 ### misc
 
 ```bash
