@@ -1,0 +1,265 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "id": 1123,
+  "panels": [
+    {
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 100,
+      "options": {
+        "content": "",
+        "mode": "markdown"
+      },
+      "title": "Hourly peak queue depth and hourly average estimated pickup wait, per GCP worker pool (active in the last 24h)",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "id": 200,
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "adpvtjmrxoc1sb"
+          },
+          "description": "Hourly peak queued tasks and hourly average estimated pickup wait for pool **${pool}** (GCP). Both computed over rolling 1h windows sampled every 5 minutes.\n\n- **Hourly Peak Queued** \u2014 `max_over_time(fxci_worker_manager_pending_tasks{workerPoolId=\"${pool}\"}[1h:5m])`. Highest pending-task count for the pool in the last hour. Left axis, count.\n- **Hourly Avg Time to Pickup** \u2014 `avg_over_time((pending / rate(completed[15m]) / 60)[1h:5m])`. Pending sourced from `fxci_worker_manager_pending_tasks` (filtered by `workerPoolId`); completion rate sourced from `fxci_queue_completed_tasks` joined via `label_join` on `provisionerId/workerType`. Right axis, minutes.\n\nVariable scope: only workerPoolIds that had `existing_capacity > 0` at some point in the last 24h are listed (filters out dead/legacy pools).",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "pointSize": 4,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "off",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Hourly Peak Queued"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "short"
+                  },
+                  {
+                    "id": "custom.axisPlacement",
+                    "value": "left"
+                  },
+                  {
+                    "id": "custom.axisLabel",
+                    "value": "Tasks queued"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Hourly Avg Time to Pickup"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "m"
+                  },
+                  {
+                    "id": "custom.axisPlacement",
+                    "value": "right"
+                  },
+                  {
+                    "id": "custom.axisLabel",
+                    "value": "Pickup wait (min)"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "orange",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 3
+          },
+          "id": 201,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull",
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.4.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "adpvtjmrxoc1sb"
+              },
+              "expr": "max_over_time(sum(fxci_worker_manager_pending_tasks{workerPoolId=\"${pool}\"})[1h:5m])",
+              "interval": "1h",
+              "legendFormat": "Hourly Peak Queued",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "adpvtjmrxoc1sb"
+              },
+              "expr": "avg_over_time((\n  (\n    sum(fxci_worker_manager_pending_tasks{workerPoolId=\"${pool}\"})\n    /\n    (sum(\n      label_join(rate(fxci_queue_completed_tasks[15m]), \"workerPoolId\", \"/\", \"provisionerId\", \"workerType\")\n      * on(workerPoolId) group_left()\n      (0 * fxci_worker_manager_pending_tasks{workerPoolId=\"${pool}\"} + 1)\n    ) > 0)\n    / 60\n  )\n  or\n  (sum(fxci_worker_manager_pending_tasks{workerPoolId=\"${pool}\"}) == 0)\n)[1h:5m])",
+              "interval": "1h",
+              "legendFormat": "Hourly Avg Time to Pickup",
+              "refId": "B"
+            }
+          ],
+          "title": "",
+          "type": "timeseries"
+        }
+      ],
+      "repeat": "pool",
+      "title": "${pool}",
+      "type": "row"
+    }
+  ],
+  "schemaVersion": 42,
+  "tags": [
+    "fxci",
+    "gcp",
+    "cloud",
+    "pickup-wait",
+    "timeline"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "adpvtjmrxoc1sb"
+        },
+        "definition": "query_result(group by (workerPoolId) (max_over_time(fxci_worker_manager_existing_capacity{providerId=~\"fxci-.*-gcp\"}[24h]) > 0))",
+        "includeAll": true,
+        "label": "Pool",
+        "multi": true,
+        "name": "pool",
+        "options": [],
+        "query": {
+          "qryType": 3,
+          "query": "query_result(group by (workerPoolId) (max_over_time(fxci_worker_manager_existing_capacity{providerId=~\"fxci-.*-gcp\"}[24h]) > 0))",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 2,
+        "regex": "/workerPoolId=\"([^\"]+)\"/",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "GCP Worker Pools \u2014 Hourly Queue Peak & Avg Pickup Wait",
+  "uid": "gcp-pickup-wait-timeline-v1",
+  "version": 2
+}
