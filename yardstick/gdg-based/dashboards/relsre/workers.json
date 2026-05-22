@@ -2824,12 +2824,12 @@
     ]
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Workers",
   "uid": "ieg6Sho5",
-  "version": 128
+  "version": 129
 }
