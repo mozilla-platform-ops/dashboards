@@ -176,7 +176,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 531,
+  "id": 1089,
   "links": [],
   "panels": [
     {
@@ -513,7 +513,7 @@
                 "value": [
                   {
                     "title": "filter by provisioner and workerType",
-                    "url": "/d/${__dashboard.uid}﻿/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=${__data.fields.workerType}"
+                    "url": "/d/${__dashboard.uid}\ufeff/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=${__data.fields.workerType}"
                   }
                 ]
               }
@@ -534,7 +534,7 @@
                 "value": [
                   {
                     "title": "filter by provisioner",
-                    "url": "/d/${__dashboard.uid}﻿/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=All"
+                    "url": "/d/${__dashboard.uid}\ufeff/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=All"
                   }
                 ]
               }
@@ -1763,7 +1763,7 @@
                 "value": [
                   {
                     "title": "filter by provisioner",
-                    "url": "/d/${__dashboard.uid}﻿/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=All"
+                    "url": "/d/${__dashboard.uid}\ufeff/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=All"
                   }
                 ]
               }
@@ -1791,7 +1791,7 @@
                 "value": [
                   {
                     "title": "filter by provisioner and workerType",
-                    "url": "/d/${__dashboard.uid}﻿/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=${__data.fields.workerType}"
+                    "url": "/d/${__dashboard.uid}\ufeff/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=${__data.fields.workerType}"
                   }
                 ]
               }
@@ -2745,7 +2745,9 @@
   "schemaVersion": 42,
   "tags": [
     "owner=relsre",
-    "relsre-backup"
+    "relsre-backup",
+    "relsre-development",
+    "taskcluster-metrics"
   ],
   "templating": {
     "list": [
@@ -2824,12 +2826,12 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-2d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Workers",
-  "uid": "ieg6Sho5",
-  "version": 129
+  "uid": "workers-fxci-dev",
+  "version": 8
 }

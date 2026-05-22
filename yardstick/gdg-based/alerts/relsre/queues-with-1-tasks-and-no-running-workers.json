@@ -1,0 +1,91 @@
+{
+  "annotations": {
+    "__dashboardUid__": "ieg6Sho5",
+    "__panelId__": "10",
+    "summary": "queues with 1+ tasks and no running workers: {{index $labels \"provisionerId\"}}/{{index $labels \"workerType\"}}"
+  },
+  "condition": "C",
+  "data": [
+    {
+      "datasourceUid": "cdq6ttvymu4g0c",
+      "model": {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "cdq6ttvymu4g0c"
+        },
+        "editorMode": "code",
+        "expr": "# Alert: Pending Tasks Without Workers\n# OWNER: aerickson\n#\n# This alert detects situations where there are **pending tasks but no running workers**\n# for a given (provisionerId, workerType) pool.\n#\n# How it works:\n# 1. `sum by (provisionerId, workerType) (fxci_queue_pending_tasks) >= X`\n#    - Selects pools with more than or equal X pending tasks. \n#    - Threshold is >1 (instead of >0) to avoid false positives from \n#      transient tasks (e.g., tc \"probe\" tasks that sit and timeout).\n#    - Raised to 10 to only alert on queues we (releng/relops) have created (vs queues where\n#      a developer just submitted something).\n# 2. `sum by (provisionerId, workerType) (fxci_queue_running_workers) > 0`\n#    - Selects pools that currently have one or more running workers.\n# 3. `A unless on (...) B`\n#    - Returns only the `pending` pools that do **not** have any running workers.\n#\n# Filters:\n# - worker-type\n#.  - test-1 (android hw test pool)\n#   - unit-p6 (android hw pool that shouldn't have tasks)\n#   - alpha (non-prod pools)\n#\n# Expected behavior:\n# - If no pools are in trouble, the query returns nothing. Grafana will show this as \"no data\".\n#   This is normal and should be treated as OK in alert settings.\n# - If a pool has >1 pending task and zero running workers, the query will emit that pool\u2019s labels,\n#   triggering the alert.\n#\n(\n  sum by (provisionerId, workerType)\n    (fxci_queue_pending_tasks{workerType!~\"^.*(test.*|unit-p6|-alpha)$\"}) >= 10\n)\nunless on (provisionerId, workerType)\n(\n  sum by (provisionerId, workerType)\n    (fxci_queue_running_workers{workerType!~\"^.*(test-1|unit-p6|-alpha)$\"}) > 0\n)\n",
+        "format": "time_series",
+        "instant": true,
+        "intervalMs": 1000,
+        "legendFormat": "{{provisionerId}}/{{workerType}} tasks",
+        "maxDataPoints": 43200,
+        "range": false,
+        "refId": "A"
+      },
+      "queryType": "",
+      "refId": "A",
+      "relativeTimeRange": {
+        "from": 600,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0,
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": []
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "name": "Expression",
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "A",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "refId": "C",
+        "type": "threshold"
+      },
+      "queryType": "",
+      "refId": "C",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    }
+  ],
+  "execErrState": "Alerting",
+  "folderUID": "edtgaia1z6waoe",
+  "for": "45m",
+  "isPaused": false,
+  "keep_firing_for": "0s",
+  "noDataState": "OK",
+  "notification_settings": {
+    "receiver": "releng - slack tf"
+  },
+  "orgID": 1,
+  "record": null,
+  "ruleGroup": "1m",
+  "title": "queues with 1+ tasks and no running workers",
+  "uid": "fewinj1g1wni8e"
+}
