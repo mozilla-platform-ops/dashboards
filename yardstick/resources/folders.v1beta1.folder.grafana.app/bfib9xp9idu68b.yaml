@@ -1,0 +1,11 @@
+apiVersion: folder.grafana.app/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    grafana.app/folder: cffmfl1sfr1moe
+  labels: {}
+  name: bfib9xp9idu68b
+  namespace: default
+spec:
+  description: ""
+  title: Windows

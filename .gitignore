@@ -1,5 +1,3 @@
 conf/*
-yardstick/dashboards.new/
-yardstick/dashboards.old/
-yardstick/alerts.new/
-yardstick/alerts.old/
+yardstick/.alerts.new/
+yardstick/.alerts.old/
