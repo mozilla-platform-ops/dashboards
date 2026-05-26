@@ -1,0 +1,1088 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 100,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "",
+        "mode": "markdown"
+      },
+      "pluginVersion": "12.4.2",
+      "title": "Per-host status for Windows wintest workers \u2014 pool/host filters apply to all panels below",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "afebxf3unvvggf"
+      },
+      "description": "Per-pool count of Windows workers (wintest) currently Available vs. Not Available, based on the Windows Generic Worker check state in the last 15 minutes.\n\n**Columns:**\n- **Pool** \u2014 worker pool ID from the `host_pool` InfluxDB measurement. Hosts without a pool record are bucketed as `Unknown`.\n- **Available (15 Minute Window)** \u2014 count of hosts whose Generic Worker check reported OK (state=0) at any point in the last 15 minutes.\n- **Not Available** \u2014 count of hosts whose Generic Worker check did NOT report OK in the last 15 minutes (warn/crit/unknown or no data).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "gray",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "pool"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pool"
+              },
+              {
+                "id": "custom.width",
+                "value": 320
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Available"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background-solid"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.wrapHeaderText",
+                "value": true
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "green",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "0"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              },
+              {
+                "id": "displayName",
+                "value": "Available (15 Minute Window)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Not Available"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background-solid"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 160
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "0"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 2
+      },
+      "id": 500,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "fields": [
+            "Available",
+            "Not Available"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Pool"
+          }
+        ]
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "afebxf3unvvggf"
+          },
+          "query": "hostFilter = (r) => r.hostname =~ /wintest/\n\nallHosts = from(bucket: \"marlin-icinga2\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"hostalive\" and r._field == \"state\")\n  |> filter(fn: hostFilter)\n  |> last()\n  |> keep(columns: [\"hostname\"])\n  |> group()\n  |> distinct(column: \"hostname\")\n  |> map(fn: (r) => ({hostname: r._value, k: \"_anchor\", v: \"\"}))\n\npoolRecords = from(bucket: \"marlin-icinga2\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"host_pool\" and r._field == \"pool\")\n  |> filter(fn: hostFilter)\n  |> last()\n  |> map(fn: (r) => ({hostname: r.hostname, k: \"pool\", v: r._value}))\n\ngwAvailability = from(bucket: \"marlin-icinga2\")\n  |> range(start: -15m)\n  |> filter(fn: (r) => r._measurement == \"nscp\" and r.service == \"Windows Generic Worker\" and r._field == \"state\")\n  |> filter(fn: hostFilter)\n  |> group(columns: [\"hostname\"])\n  |> min(column: \"_value\")\n  |> map(fn: (r) => ({hostname: r.hostname, k: \"gwAvail\", v: if r._value == 0 then \"yes\" else \"no\"}))\n\ncombined = union(tables: [allHosts, poolRecords, gwAvailability])\n  |> group()\n  |> pivot(rowKey: [\"hostname\"], columnKey: [\"k\"], valueColumn: \"v\")\n  |> drop(columns: [\"_anchor\"])\n  |> map(fn: (r) => ({\n       hostname: r.hostname,\n       pool: if exists r.pool then r.pool else \"Unknown\",\n       gwAvail: if exists r.gwAvail then r.gwAvail else \"no\"\n     }))\n\navailable = combined\n  |> filter(fn: (r) => r.gwAvail == \"yes\")\n  |> group(columns: [\"pool\"])\n  |> count(column: \"hostname\")\n  |> map(fn: (r) => ({pool: r.pool, kind: \"Available\", n: r.hostname}))\n\nnotAvailable = combined\n  |> filter(fn: (r) => r.gwAvail != \"yes\")\n  |> group(columns: [\"pool\"])\n  |> count(column: \"hostname\")\n  |> map(fn: (r) => ({pool: r.pool, kind: \"Not Available\", n: r.hostname}))\n\nunion(tables: [available, notAvailable])\n  |> group()\n  |> pivot(rowKey: [\"pool\"], columnKey: [\"kind\"], valueColumn: \"n\")\n  |> map(fn: (r) => ({\n       pool: r.pool,\n       Available: if exists r.Available then r.Available else 0,\n       \"Not Available\": if exists r[\"Not Available\"] then r[\"Not Available\"] else 0\n     }))\n  |> sort(columns: [\"pool\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Pool Summary",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "Available": 1,
+              "Not Available": 2,
+              "pool": 0
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "adpvtjmrxoc1sb"
+      },
+      "description": "Live queue depth and worker activity per Windows pool, sourced from Prometheus (`fxci_queue_*` metrics). Filtered to `provisionerId=releng-hardware`, `workerType=~.*win.*`, excluding win7.\n\n**Columns:**\n- **Pool** \u2014 worker pool ID derived from the Prometheus `workerType` label.\n- **Active** \u2014 `fxci_queue_running_workers`: current count of running workers.\n- **Queue** \u2014 `fxci_queue_pending_tasks`: current count of pending tasks.\n- **24h Peak** \u2014 `max_over_time(...[24h:])` of pending tasks; highest queue depth seen in the last 24 hours.\n- **Avg Task Age (min)** \u2014 estimated average age of currently-pending tasks (time spent waiting in the queue). Computed via Little's Law: `pending / rate(completed[1h]) / 60`. Steady-state proxy \u2014 we don't have per-task timestamps, so this is the expected wait under current throughput, not a true measurement. Idle pools (pending=0) show **0.0**; pools with a backlog but no completions in the last hour show \u2014.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "gray",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "pool"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pool"
+              },
+              {
+                "id": "custom.width",
+                "value": 320
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Queue"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background-solid"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 500
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "0"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": []
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Active"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background-solid"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 120
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "gray",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "0"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "24h Peak"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background-solid"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 500
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "0"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg Task Age (min)"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 170
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "noValue",
+                "value": "\u2014"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "text": "\u2014"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 2
+      },
+      "id": 510,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "fields": [
+            "Queue",
+            "Active"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Pool"
+          }
+        ]
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "adpvtjmrxoc1sb"
+          },
+          "expr": "sum by (pool) (label_replace(fxci_queue_pending_tasks{provisionerId=\"releng-hardware\", workerType=~\".*win.*\", workerType!~\".*win7.*\"}, \"pool\", \"$1\", \"workerType\", \"(.*)\"))",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "adpvtjmrxoc1sb"
+          },
+          "expr": "sum by (pool) (label_replace(fxci_queue_running_workers{provisionerId=\"releng-hardware\", workerType=~\".*win.*\", workerType!~\".*win7.*\"}, \"pool\", \"$1\", \"workerType\", \"(.*)\"))",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "adpvtjmrxoc1sb"
+          },
+          "expr": "max_over_time(sum by (pool) (label_replace(fxci_queue_pending_tasks{provisionerId=\"releng-hardware\", workerType=~\".*win.*\", workerType!~\".*win7.*\"}, \"pool\", \"$1\", \"workerType\", \"(.*)\"))[24h:])",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "adpvtjmrxoc1sb"
+          },
+          "expr": "(\n  sum by (pool) (label_replace(fxci_queue_pending_tasks{provisionerId=\"releng-hardware\", workerType=~\".*win.*\", workerType!~\".*win7.*\"}, \"pool\", \"$1\", \"workerType\", \"(.*)\"))\n  /\n  (sum by (pool) (label_replace(rate(fxci_queue_completed_tasks{provisionerId=\"releng-hardware\", workerType=~\".*win.*\", workerType!~\".*win7.*\"}[1h]), \"pool\", \"$1\", \"workerType\", \"(.*)\")) > 0)\n  / 60\n)\nor\nsum by (pool) (label_replace(fxci_queue_pending_tasks{provisionerId=\"releng-hardware\", workerType=~\".*win.*\", workerType!~\".*win7.*\"}, \"pool\", \"$1\", \"workerType\", \"(.*)\")) == 0",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "D"
+        }
+      ],
+      "title": "Pool Queues",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "pool",
+            "mode": "outer"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true
+            },
+            "indexByName": {
+              "Value #A": 2,
+              "Value #B": 1,
+              "Value #C": 3,
+              "Value #D": 4,
+              "pool": 0
+            },
+            "renameByName": {
+              "Value #A": "Queue",
+              "Value #B": "Active",
+              "Value #C": "24h Peak",
+              "Value #D": "Avg Task Age (min)"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "afebxf3unvvggf"
+      },
+      "description": "Per-host status for pool **${pool}**. One row per Windows host expected to report (anchored on `hostalive` over the last 1h). Service columns show the worst state observed in the last 10 minutes. Grey \u25cf = no data / host fell off the short window.\n\n**Columns:**\n- **Hostname** \u2014 FQDN of the Windows worker as Icinga reports it.\n- **Up** \u2014 `hostalive` state. Green=Up, Red=Down, Yellow=Unreachable, Grey=no data.\n- **Bootstrap** \u2014 `Windows Bootstrap Stage` (nrpe). Green=OK, Yellow=Warn, Red=Crit, Grey=Unknown/no data.\n- **Screen** \u2014 `Windows Screen` (nrpe). Green=OK, Yellow=Warn, Red=Crit, Grey=Unknown/no data.\n- **Generic Worker** \u2014 `Windows Generic Worker` (nscp). Green=OK (taking work), Yellow=Warn, Red=Crit, Grey=Unknown/no data.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "hostname"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Hostname"
+              },
+              {
+                "id": "custom.width",
+                "value": 380
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Up"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 60
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "green",
+                        "text": "\u25cf"
+                      },
+                      "1": {
+                        "color": "red",
+                        "text": "\u25cf"
+                      },
+                      "2": {
+                        "color": "yellow",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "match": "empty",
+                      "result": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Bootstrap"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 90
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "green",
+                        "text": "\u25cf"
+                      },
+                      "1": {
+                        "color": "yellow",
+                        "text": "\u25cf"
+                      },
+                      "2": {
+                        "color": "red",
+                        "text": "\u25cf"
+                      },
+                      "3": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "match": "empty",
+                      "result": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Screen"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 70
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "green",
+                        "text": "\u25cf"
+                      },
+                      "1": {
+                        "color": "yellow",
+                        "text": "\u25cf"
+                      },
+                      "2": {
+                        "color": "red",
+                        "text": "\u25cf"
+                      },
+                      "3": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "match": "empty",
+                      "result": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Generic Worker"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.width",
+                "value": 110
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "green",
+                        "text": "\u25cf"
+                      },
+                      "1": {
+                        "color": "yellow",
+                        "text": "\u25cf"
+                      },
+                      "2": {
+                        "color": "red",
+                        "text": "\u25cf"
+                      },
+                      "3": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "match": "null",
+                      "result": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "special"
+                  },
+                  {
+                    "options": {
+                      "match": "empty",
+                      "result": {
+                        "color": "gray",
+                        "text": "\u25cf"
+                      }
+                    },
+                    "type": "special"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 410,
+      "maxPerRow": 2,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Hostname"
+          }
+        ]
+      },
+      "pluginVersion": "12.4.2",
+      "repeat": "pool",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "afebxf3unvvggf"
+          },
+          "query": "hostFilter = (r) => r.hostname =~ /wintest/\n\nexpectedHosts = from(bucket: \"marlin-icinga2\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"hostalive\" and r._field == \"state\")\n  |> filter(fn: hostFilter)\n  |> last()\n  |> keep(columns: [\"hostname\"])\n  |> group()\n  |> distinct(column: \"hostname\")\n  |> map(fn: (r) => ({hostname: r._value, k: \"_anchor\", v: \"\"}))\n\npool = from(bucket: \"marlin-icinga2\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"host_pool\" and r._field == \"pool\")\n  |> filter(fn: hostFilter)\n  |> last()\n  |> map(fn: (r) => ({hostname: r.hostname, k: \"Pool\", v: r._value}))\n\nup = from(bucket: \"marlin-icinga2\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"hostalive\" and r._field == \"state\")\n  |> filter(fn: hostFilter)\n  |> last()\n  |> map(fn: (r) => ({hostname: r.hostname, k: \"Up\", v: string(v: r._value)}))\n\nmkService = (m, s, col) =>\n  from(bucket: \"marlin-icinga2\")\n    |> range(start: -10m)\n    |> filter(fn: (r) => r._measurement == m and r.service == s and r._field == \"state\")\n    |> filter(fn: hostFilter)\n    |> last()\n    |> map(fn: (r) => ({hostname: r.hostname, k: col, v: string(v: r._value)}))\n\nmkServiceMin = (m, s, col) =>\n  from(bucket: \"marlin-icinga2\")\n    |> range(start: -10m)\n    |> filter(fn: (r) => r._measurement == m and r.service == s and r._field == \"state\")\n    |> filter(fn: hostFilter)\n    |> group(columns: [\"hostname\"])\n    |> min(column: \"_value\")\n    |> map(fn: (r) => ({hostname: r.hostname, k: col, v: string(v: r._value)}))\n\nbootstrap = mkServiceMin(m: \"nrpe\", s: \"Windows Bootstrap Stage\", col: \"Bootstrap\")\nscreen = mkService(m: \"nrpe\", s: \"Windows Screen\", col: \"Screen\")\ngw = mkServiceMin(m: \"nscp\", s: \"Windows Generic Worker\", col: \"Generic Worker\")\n\nunion(tables: [expectedHosts, pool, up, bootstrap, screen, gw])\n  |> group()\n  |> pivot(rowKey: [\"hostname\"], columnKey: [\"k\"], valueColumn: \"v\")\n  |> drop(columns: [\"_anchor\"])\n  |> map(fn: (r) => ({\n       hostname: r.hostname,\n       Pool: if exists r.Pool then r.Pool else \"Unknown\",\n       Up: if exists r.Up then r.Up else \"\",\n       Bootstrap: if exists r.Bootstrap then r.Bootstrap else \"\",\n       Screen: if exists r.Screen then r.Screen else \"\",\n       \"Generic Worker\": if exists r[\"Generic Worker\"] then r[\"Generic Worker\"] else \"\"\n     }))\n  |> filter(fn: (r) => r.Pool == \"${pool}\")\n  |> filter(fn: (r) => r.hostname =~ /^${hostname:regex}$/)\n  |> sort(columns: [\"hostname\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "${pool}",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Pool": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "Bootstrap": 2,
+              "Generic Worker": 4,
+              "Screen": 3,
+              "Up": 0,
+              "hostname": 1
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [
+    "windows",
+    "wintest",
+    "status"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "afebxf3unvvggf"
+        },
+        "definition": "import \"experimental/array\"\n\nactualPools = from(bucket: \"marlin-icinga2\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"host_pool\" and r._field == \"pool\")\n  |> filter(fn: (r) => r.hostname =~ /wintest/)\n  |> last()\n  |> group()\n  |> distinct(column: \"_value\")\n  |> keep(columns: [\"_value\"])\n  |> map(fn: (r) => ({_value: r._value, sk: \"0_\" + r._value}))\n\nunknownRow = array.from(rows: [{_value: \"Unknown\", sk: \"1_Unknown\"}])\n\nunion(tables: [actualPools, unknownRow])\n  |> sort(columns: [\"sk\"])\n  |> keep(columns: [\"_value\"])",
+        "includeAll": true,
+        "label": "Pool",
+        "multi": true,
+        "name": "pool",
+        "options": [],
+        "query": {
+          "query": "import \"experimental/array\"\n\nactualPools = from(bucket: \"marlin-icinga2\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"host_pool\" and r._field == \"pool\")\n  |> filter(fn: (r) => r.hostname =~ /wintest/)\n  |> last()\n  |> group()\n  |> distinct(column: \"_value\")\n  |> keep(columns: [\"_value\"])\n  |> map(fn: (r) => ({_value: r._value, sk: \"0_\" + r._value}))\n\nunknownRow = array.from(rows: [{_value: \"Unknown\", sk: \"1_Unknown\"}])\n\nunion(tables: [actualPools, unknownRow])\n  |> sort(columns: [\"sk\"])\n  |> keep(columns: [\"_value\"])",
+          "refId": "Var-Pool"
+        },
+        "refresh": 2,
+        "regex": "",
+        "regexApplyTo": "value",
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "afebxf3unvvggf"
+        },
+        "definition": "from(bucket: \"marlin-icinga2\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"host_pool\" and r._field == \"pool\")\n  |> filter(fn: (r) => r.hostname =~ /wintest/)\n  |> filter(fn: (r) => r._value =~ /^${pool:regex}$/)\n  |> last()\n  |> keep(columns: [\"hostname\"])\n  |> group()\n  |> distinct(column: \"hostname\")\n  |> sort()",
+        "includeAll": true,
+        "label": "Hostname",
+        "multi": true,
+        "name": "hostname",
+        "options": [],
+        "query": {
+          "query": "from(bucket: \"marlin-icinga2\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"host_pool\" and r._field == \"pool\")\n  |> filter(fn: (r) => r.hostname =~ /wintest/)\n  |> filter(fn: (r) => r._value =~ /^${pool:regex}$/)\n  |> last()\n  |> keep(columns: [\"hostname\"])\n  |> group()\n  |> distinct(column: \"hostname\")\n  |> sort()",
+          "refId": "Var-Hostname"
+        },
+        "refresh": 2,
+        "regex": "",
+        "regexApplyTo": "value",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Windows All Status",
+  "uid": "windows-all-resource-v3",
+  "weekStart": ""
+}

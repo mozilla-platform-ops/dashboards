@@ -12,15 +12,19 @@ yardstick/ - our newer self-hosted grafana dashboards, prometheus based
 
 Historical Yardstick backups used [Wizzy](https://github.com/grafana-wizzy/wizzy)
 (now deprecated) and later [GDG](https://github.com/esnet/gdg). The current
-flow uses [`gcx`](https://github.com/grafana/gcx) — see
-[`yardstick/README.md`](yardstick/README.md) and the `gcx` section below.
+backup flow is a small Python script hitting Grafana's REST API through
+Mozilla's `mzcld` IAP proxy — see [`yardstick/README.md`](yardstick/README.md).
 The `earthangel/` tree is frozen as a historical reference.
 
-## gcx
+[`gcx`](https://github.com/grafana/gcx) stays installed for ad-hoc CLI
+work and the bundled agent skills, but is not used for the backup loop.
 
-[`gcx`](https://github.com/grafana/gcx) is the Grafana CLI. It's useful for
+## gcx (ad-hoc CLI)
+
+[`gcx`](https://github.com/grafana/gcx) is Grafana's CLI. Useful for
 ad-hoc inspection of Yardstick dashboards, alert rules, and datasources
-without exporting browser cookies or running Docker.
+without exporting browser cookies or running Docker. Not required for
+the daily backup workflow.
 
 Mozilla's full guide is in the SRE Confluence:
 [How to: Use Grafana with Claude Code, Grafana MCP, and Grafana gcx](https://mozilla-hub.atlassian.net/wiki/spaces/SRE/pages/2641985695/How+to+Use+Grafana+with+Claude+Code+Grafana+MCP+and+Grafana+gcx).
@@ -91,35 +95,36 @@ that hit Grafana directly (alert pull, UID discovery), export
 [`yardstick/README.md`](yardstick/README.md#credential-persistence) for
 the full caching story.
 
-### backing up and editing dashboards
-
-Day-to-day work runs through the `yardstick/` Makefile:
-
-```bash
-cd yardstick
-make help          # list targets
-make backup        # pull RelSRE dashboards/folders/alerts into resources/ and alerts/
-make diff          # preview drift without writing files
-make push          # apply local resource edits back to Yardstick
-make validate      # server-side schema check on resources/
-```
-
-See [`yardstick/README.md`](yardstick/README.md) for the full workflow, the
-folder/dashboard scope lists, and gcx gotchas (e.g. `gcx dashboards search
---folder` is broken against Yardstick's nested folders; gcx splits resources
-across `v0alpha1`/`v1beta1` API-version directories).
-
-For ad-hoc commands without the Makefile:
+### ad-hoc gcx commands
 
 ```bash
 gcx dashboards list
 gcx dashboards search "workers"
 gcx dashboards get <UID> -o json
+gcx metrics query 'rate(grafana_http_request_duration_seconds_count[5m])' --since 1h
 ```
 
-`gcx` also covers datasources, SLOs, and more (most Cloud-only features are
-unavailable against Yardstick OSS). See `gcx --help` and the agent skills:
+`gcx` also covers datasources, alert rules, and more (most Cloud-only
+features are unavailable against Yardstick OSS). See `gcx --help` and
+the bundled agent skills:
 
 ```bash
 gcx agent skills list
 ```
+
+### daily backup workflow
+
+The backup loop lives in [`yardstick/`](yardstick/) and uses a Python
+script against the Grafana REST API (`gcx resources pull` produces an
+unreviewable Kubernetes-style layout, so it isn't used for the backup
+tree). Full details: [`yardstick/README.md`](yardstick/README.md).
+
+```bash
+cd yardstick
+make help          # list targets
+make backup        # pull RelSRE dashboards + alerts into dashboards/ and alerts/
+make diff          # preview drift without overwriting
+```
+
+Dashboard authoring still happens in the Grafana UI; `make backup`
+captures the result.
