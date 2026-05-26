@@ -65,7 +65,7 @@ diff: check-proxy
 	  diff -r resources/ $$tmp/resources/ || true
 
 discover-uids: check-proxy
-	@token=$$(op read "$(TOKEN_REF)"); \
+	@token=$${GRAFANA_TOKEN:-$$(op read "$(TOKEN_REF)")}; \
 	for f in $(FOLDER_UIDS); do \
 	  title=$$(curl -sS -H "Authorization: Bearer $$token" "$(BASE_URL)/api/folders/$$f" | jq -r '.title'); \
 	  echo "## $$title ($$f)"; \

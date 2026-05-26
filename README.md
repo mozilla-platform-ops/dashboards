@@ -83,6 +83,14 @@ gcx config use-context yardstick
 gcx config check        # should report ✔ Connectivity and the Grafana version
 ```
 
+`gcx login` writes the token to `~/.config/gcx/config.yaml`, so
+subsequent `gcx` commands reuse it automatically — you do not need
+`--token` on every call. For the helper scripts under `yardstick/scripts/`
+that hit Grafana directly (alert pull, UID discovery), export
+`GRAFANA_TOKEN` once per shell to avoid repeated 1Password prompts. See
+[`yardstick/README.md`](yardstick/README.md#credential-persistence) for
+the full caching story.
+
 ### backing up and editing dashboards
 
 Day-to-day work runs through the `yardstick/` Makefile:

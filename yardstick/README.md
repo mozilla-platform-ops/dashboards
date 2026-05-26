@@ -66,7 +66,43 @@ make discover-uids
 
 Environment overrides:
 - `BASE_URL` — defaults to `http://localhost:3000`
-- `TOKEN_REF` — defaults to `op://RelOps/Grafana Yardstick Service Account Token/credential`
+- `TOKEN_REF` — 1Password reference used by `pull_alerts.py` and
+  `discover-uids` (defaults to
+  `op://RelOps/Grafana Yardstick Service Account Token/credential`)
+- `GRAFANA_TOKEN` — if set, scripts use it directly and skip `op read`.
+  See *Credential persistence* below.
+
+## Credential persistence
+
+The Yardstick service-account token is stored in 1Password
+(`op://RelOps/Grafana Yardstick Service Account Token/credential`).
+Two layers cache it during day-to-day work:
+
+1. **gcx caches its token after the first login.** Running
+   `gcx login yardstick --server http://localhost:3000 --token "$(op read ...)" --yes`
+   writes the token to `~/.config/gcx/config.yaml`. Subsequent
+   `gcx ...` commands (including `make backup`, `make push`, etc.)
+   reuse that cached token automatically — you do **not** pass
+   `--token` again. Re-run `gcx login` only after token rotation or to
+   point at a different stack.
+2. **Shell env var for the scripts.** `pull_alerts.py` and the
+   `discover-uids` curl loop call `op read` by default, which prompts
+   1Password each invocation. To suppress that, cache the token once
+   per shell:
+
+   ```bash
+   export GRAFANA_TOKEN=$(op read 'op://RelOps/Grafana Yardstick Service Account Token/credential')
+   ```
+
+   `pull_alerts.py` and `make discover-uids` pick up `GRAFANA_TOKEN`
+   first and only fall back to `op read` when it is unset. To avoid
+   leaving the token in shell history, prefer
+   [`op run`](https://developer.1password.com/docs/cli/reference/commands/run/)
+   with an `.env` file (gitignored).
+
+The token in `~/.config/gcx/config.yaml` is stored in plain text — same
+caveat as the SRE Confluence guide. Treat that file like any other
+credential at rest.
 
 ## Editing dashboards
 

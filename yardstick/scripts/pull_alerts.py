@@ -49,8 +49,21 @@ def slugify(text: str) -> str:
     return re.sub(r"[^a-z0-9-]", "", text.lower().replace(" ", "-")) or "untitled"
 
 
+def fetch_token() -> str:
+    """Return the Yardstick service-account token.
+
+    Prefers `GRAFANA_TOKEN` (set once per shell with
+    `export GRAFANA_TOKEN=$(op read ...)`) so we don't shell out to
+    1Password on every backup. Falls back to `op read $TOKEN_REF`.
+    """
+    cached = os.environ.get("GRAFANA_TOKEN")
+    if cached:
+        return cached.strip()
+    return subprocess.check_output(["op", "read", TOKEN_REF], text=True).strip()
+
+
 def main() -> int:
-    token = subprocess.check_output(["op", "read", TOKEN_REF], text=True).strip()
+    token = fetch_token()
     req = urllib.request.Request(
         f"{BASE_URL}/api/v1/provisioning/alert-rules",
         headers={"Authorization": f"Bearer {token}"},
