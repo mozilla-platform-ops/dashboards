@@ -1,0 +1,11 @@
+apiVersion: folder.grafana.app/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    grafana.app/folder: edtgaia1z6waoe
+  labels: {}
+  name: cffmfl1sfr1moe
+  namespace: default
+spec:
+  description: ""
+  title: FXCI Hardware Workers

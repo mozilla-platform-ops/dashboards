@@ -1,0 +1,11 @@
+apiVersion: folder.grafana.app/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    grafana.app/folder: efmrv608qkr28f
+  labels: {}
+  name: bfmrv6ezxze9sa
+  namespace: default
+spec:
+  description: ""
+  title: Azure

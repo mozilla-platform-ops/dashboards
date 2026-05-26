@@ -10,11 +10,11 @@ yardstick/ - our newer self-hosted grafana dashboards, prometheus based
 
 ## tools
 
-We previously used the now-deprecated Wizzy (https://github.com/grafana-wizzy/wizzy).
-
-We're using GDG (https://github.com/esnet/gdg) now. See
-[`yardstick/gdg-based/README.md`](yardstick/gdg-based/README.md) for the GDG
-workflow against Yardstick.
+Historical Yardstick backups used [Wizzy](https://github.com/grafana-wizzy/wizzy)
+(now deprecated) and later [GDG](https://github.com/esnet/gdg). The current
+flow uses [`gcx`](https://github.com/grafana/gcx) — see
+[`yardstick/README.md`](yardstick/README.md) and the `gcx` section below.
+The `earthangel/` tree is frozen as a historical reference.
 
 ## gcx
 
@@ -83,39 +83,34 @@ gcx config use-context yardstick
 gcx config check        # should report ✔ Connectivity and the Grafana version
 ```
 
-### interact with dashboards
+### backing up and editing dashboards
+
+Day-to-day work runs through the `yardstick/` Makefile:
 
 ```bash
-# list all dashboards in the current context
+cd yardstick
+make help          # list targets
+make backup        # pull RelSRE dashboards/folders/alerts into resources/ and alerts/
+make diff          # preview drift without writing files
+make push          # apply local resource edits back to Yardstick
+make validate      # server-side schema check on resources/
+```
+
+See [`yardstick/README.md`](yardstick/README.md) for the full workflow, the
+folder/dashboard scope lists, and gcx gotchas (e.g. `gcx dashboards search
+--folder` is broken against Yardstick's nested folders; gcx splits resources
+across `v0alpha1`/`v1beta1` API-version directories).
+
+For ad-hoc commands without the Makefile:
+
+```bash
 gcx dashboards list
-
-# search by title
 gcx dashboards search "workers"
-
-# fetch one dashboard as JSON (UID from list/search output)
 gcx dashboards get <UID> -o json
 ```
 
-`gcx dashboards search --folder <name>` does **not** work against Yardstick's
-nested-folder layout — it returns an empty list. Filter by folder UID through
-the underlying API instead, e.g.:
-
-```bash
-TOKEN=$(op read 'op://RelOps/Grafana Yardstick Service Account Token/credential')
-curl -sS -H "Authorization: Bearer $TOKEN" \
-  'http://localhost:3000/api/folders' | jq '.[] | select(.title=="RelSRE")'
-curl -sS -H "Authorization: Bearer $TOKEN" \
-  'http://localhost:3000/api/search?folderUIDs=<FOLDER_UID>&type=dash-db&limit=500' \
-  | jq -r '.[] | "\(.title)\t\(.uid)"'
-```
-
-To enumerate the full RelSRE subfolder tree, walk
-`/api/folders?parentUid=<UID>` for each level.
-
-### other resources
-
-`gcx` covers alert rules, datasources, SLOs, and more. See `gcx --help` and
-the agent skills bundled with the CLI:
+`gcx` also covers datasources, SLOs, and more (most Cloud-only features are
+unavailable against Yardstick OSS). See `gcx --help` and the agent skills:
 
 ```bash
 gcx agent skills list

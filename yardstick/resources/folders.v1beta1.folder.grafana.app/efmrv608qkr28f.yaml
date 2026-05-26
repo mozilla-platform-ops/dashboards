@@ -1,0 +1,11 @@
+apiVersion: folder.grafana.app/v1beta1
+kind: Folder
+metadata:
+  annotations:
+    grafana.app/folder: edtgaia1z6waoe
+  labels: {}
+  name: efmrv608qkr28f
+  namespace: default
+spec:
+  description: ""
+  title: FXCI Cloud Workers

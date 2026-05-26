@@ -1,0 +1,168 @@
+{
+  "annotations": {
+    "__dashboardUid__": "xqkIk8HZz",
+    "__panelId__": "8"
+  },
+  "condition": "C",
+  "data": [
+    {
+      "datasourceUid": "adpvtjmrxoc1sb",
+      "model": {
+        "adhocFilters": [],
+        "alias": "functioning worker %",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "adpvtjmrxoc1sb"
+        },
+        "editorMode": "code",
+        "expr": "(sum by() (tc_android_prometheus_worker_health_configured_devices) - sum by() (tc_android_prometheus_worker_health_missing_or_offline_devices)) / sum by() (tc_android_prometheus_worker_health_configured_devices) * 100",
+        "groupBy": [
+          {
+            "params": [
+              "$__interval"
+            ],
+            "type": "time"
+          },
+          {
+            "params": [
+              "none"
+            ],
+            "type": "fill"
+          }
+        ],
+        "interval": "",
+        "intervalMs": 30000,
+        "legendFormat": "__auto",
+        "maxDataPoints": 43200,
+        "measurement": "bitbar_workers",
+        "orderByTime": "ASC",
+        "policy": "default",
+        "query": "SELECT ((sum(\"configured\")- sum(\"problem\")) / sum(\"configured\")) * 100  FROM \"bitbar_workers\" WHERE $timeFilter GROUP BY time($__interval) fill(none)",
+        "range": true,
+        "rawQuery": true,
+        "refId": "A",
+        "resultFormat": "time_series",
+        "select": [
+          [
+            {
+              "params": [
+                "configured"
+              ],
+              "type": "field"
+            },
+            {
+              "params": [],
+              "type": "sum"
+            }
+          ]
+        ],
+        "tags": []
+      },
+      "queryType": "",
+      "refId": "A",
+      "relativeTimeRange": {
+        "from": 86400,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "B"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "A",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "reducer": "last",
+        "refId": "B",
+        "type": "reduce"
+      },
+      "queryType": "",
+      "refId": "B",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                85
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "C"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "B",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "refId": "C",
+        "type": "threshold"
+      },
+      "queryType": "",
+      "refId": "C",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    }
+  ],
+  "execErrState": "Error",
+  "folderUID": "edtgaia1z6waoe",
+  "for": "1m",
+  "isPaused": false,
+  "keep_firing_for": "0s",
+  "noDataState": "NoData",
+  "notification_settings": {
+    "receiver": "Release SRE - email aerickson"
+  },
+  "orgID": 1,
+  "record": null,
+  "ruleGroup": "1m",
+  "title": "Android Hw - Bitbar Device Health Percentage - Alert",
+  "uid": "cee5kch3tqtc0b"
+}

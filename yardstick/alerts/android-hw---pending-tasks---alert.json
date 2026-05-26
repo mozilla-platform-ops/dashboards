@@ -1,0 +1,164 @@
+{
+  "annotations": {
+    "__dashboardUid__": "xqkIk8HZz",
+    "__panelId__": "12"
+  },
+  "condition": "C",
+  "data": [
+    {
+      "datasourceUid": "adpvtjmrxoc1sb",
+      "model": {
+        "adhocFilters": [],
+        "datasource": {
+          "type": "prometheus",
+          "uid": "adpvtjmrxoc1sb"
+        },
+        "editorMode": "code",
+        "expr": "sum by () (tc_android_prometheus_worker_health_configured_devices)",
+        "instant": false,
+        "interval": "",
+        "intervalMs": 30000,
+        "legendFormat": "total configured workers",
+        "maxDataPoints": 43200,
+        "range": true,
+        "refId": "A"
+      },
+      "queryType": "",
+      "refId": "A",
+      "relativeTimeRange": {
+        "from": 86400,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "adpvtjmrxoc1sb",
+      "model": {
+        "adhocFilters": [],
+        "datasource": {
+          "type": "prometheus",
+          "uid": "adpvtjmrxoc1sb"
+        },
+        "disableTextWrap": false,
+        "editorMode": "builder",
+        "expr": "sum by() (tc_queue2_prometheus_pending_tasks{provisioner=\"proj-autophone\"})",
+        "fullMetaSearch": false,
+        "includeNullMetadata": true,
+        "instant": false,
+        "interval": "",
+        "intervalMs": 30000,
+        "legendFormat": "total pending tasks",
+        "maxDataPoints": 43200,
+        "range": true,
+        "refId": "B",
+        "useBackend": false
+      },
+      "queryType": "",
+      "refId": "B",
+      "relativeTimeRange": {
+        "from": 86400,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0,
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": []
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "name": "Expression",
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "B",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "reducer": "last",
+        "refId": "D",
+        "type": "reduce"
+      },
+      "queryType": "",
+      "refId": "D",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                1000,
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": []
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "name": "Expression",
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "D",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "refId": "C",
+        "type": "threshold"
+      },
+      "queryType": "",
+      "refId": "C",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    }
+  ],
+  "execErrState": "Error",
+  "folderUID": "edtgaia1z6waoe",
+  "for": "1m",
+  "isPaused": false,
+  "keep_firing_for": "0s",
+  "noDataState": "NoData",
+  "notification_settings": {
+    "receiver": "Release SRE - PD - Android Hardware TC Queues - Low Priority"
+  },
+  "orgID": 1,
+  "record": null,
+  "ruleGroup": "1m",
+  "title": "Android Hw - Pending Tasks - Alert",
+  "uid": "eee5ommd02yo0b"
+}

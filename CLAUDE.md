@@ -4,33 +4,60 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A version-controlled backup of Mozilla RelSRE Grafana dashboards (and the alert rules that live alongside them). No build, lint, or test pipeline — changes land as JSON diffs reviewed in PRs.
+A version-controlled backup of Mozilla RelSRE Grafana dashboards, folders,
+and alert rules from `yardstick.mozilla.org`. No build/lint/test pipeline —
+changes land as YAML/JSON diffs reviewed in PRs.
 
 ## Repo layout
 
-- `yardstick/` — **active** backups for the current self-hosted Prometheus-based Grafana (https://yardstick.mozilla.org). Touch this tree for any current work.
-  - `gdg-based/dashboards/` — tracked dashboard JSON, organized to mirror the RelSRE folder tree in Yardstick. See the mapping table in `yardstick/gdg-based/README.md`.
-  - `gdg-based/alerts/` — alert-rule JSON mirroring the same folder layout. Alert rules live in the same Grafana folder as the dashboards they monitor (per the RelSRE wiki).
-  - `gdg-based/config/importer.yml` — placeholder; replace with the real config from 1Password before running GDG.
-  - `gdg-based/run_gdg.sh` — runs the `ghcr.io/esnet/gdg` Docker image with `config/` and `exports/` mounted in.
-  - `manual/` — historical one-off exports; do not add new files here.
-- `earthangel/` — **historical** backups of the previous Influx-based hosted Grafana (wizzy and an early gdg attempt). Read-only reference; do not add new dashboards here.
+- `yardstick/` — **active** RelSRE backup from Yardstick. All current work
+  happens here.
+  - `Makefile` — `make backup / push / validate / diff / discover-uids`.
+    Scope is hardcoded in `FOLDER_UIDS` and `DASHBOARD_UIDS`; mirror
+    changes into `scripts/pull_alerts.py:RELSRE_FOLDER_UIDS`.
+  - `scripts/pull_alerts.py` — alert-rule backup via the Grafana
+    provisioning API (gcx's alert yaml carries live evaluation state and
+    is not usable for committing).
+  - `resources/` — `gcx resources pull` / `push` target. Flat by kind:
+    `dashboards.v0alpha1.dashboard.grafana.app/<UID>.yaml`,
+    `dashboards.v1beta1.dashboard.grafana.app/<UID>.yaml`,
+    `folders.v1beta1.folder.grafana.app/<UID>.yaml`. Folder hierarchy
+    lives in `metadata.annotations["grafana.app/folder"]`, not on disk.
+  - `alerts/` — one stripped JSON per RelSRE alert rule
+    (`<title-slug>.json`).
+- `earthangel/` — **historical** backups of the old Influx-based hosted
+  Grafana (wizzy and an early gdg attempt). Read-only reference.
 
-## Backing up dashboards and alerts
+## Daily workflow
 
-Three working methods, in preference order:
-
-1. **GDG (preferred when set up):** drop the 1Password `importer.yml` into `yardstick/gdg-based/config/`, then `./run_gdg.sh backup dash download -f RelSRE`. Copy GDG's output into the tracked directories above before committing.
-2. **gcx via local Yardstick proxy:** see the top-level `README.md` `gcx` section. Auth uses the 1Password item `op://RelOps/Grafana Yardstick Service Account Token` against `http://localhost:3000`. The proxy itself is `mzcld iap --host yardstick.mozilla.org --proxy --port 3000` ([mzcld](https://github.com/mozilla/mozcloud/tree/main/tools/mzcld)) — it must be running for any `localhost:3000` call (including the raw curl fallback) to work, since Yardstick is behind Google IAP and rejects service-account tokens directly.
-3. **Raw curl fallback:** Netscape-format cookies from `yardstick.mozilla.org` + `/api/search?folderUIDs=<UID>` and `/api/dashboards/uid/<UID>`. See `yardstick/gdg-based/README.md` for exact commands.
+1. Start the IAP proxy in another terminal:
+   `mzcld iap --host yardstick.mozilla.org --proxy --port 3000`.
+2. `cd yardstick && make backup` (or `make diff` to preview without
+   writing). gcx talks to `http://localhost:3000`; the proxy injects the
+   Google IAP token automatically.
+3. Edit YAML under `resources/`, `make validate` then `make push`, then
+   `make backup` once more to capture any server-injected fields.
 
 ## Hard rules for backup/update PRs
 
-- Never run `clear` or delete dashboards as part of a backup/update PR — only add or modify the JSON for what changed.
-- Strip server-churn fields (`id`, `updated`, `version`) from alert-rule JSON before committing so diffs stay clean.
-- `RelSRE/RelSRE Sandboxes` is intentionally untracked (personal/test dashboards). Do not start tracking it.
+- Never delete dashboards as part of a routine backup. If a dashboard
+  disappears upstream, confirm intent before committing the deletion.
+- Alert rules are pushed via the Grafana UI or Terraform, not
+  `gcx resources push` (gcx alert yaml is live-state-polluted).
+- Strip server-churn fields (`id`, `updated`, `version`) from alert JSON —
+  `pull_alerts.py` already does this; don't reintroduce them.
+- `RelSRE Sandboxes` (folder UID `dedlat92kts74e`) is intentionally not in
+  `FOLDER_UIDS` / `RELSRE_FOLDER_UIDS` — keep it that way.
 
 ## Yardstick-specific gotchas
 
-- `gcx dashboards search --folder <name>` returns empty against Yardstick's nested-folder layout. Use `/api/search?folderUIDs=<UID>` (or the gcx equivalent against a specific UID) for folder filtering.
-- Yardstick rotates session tokens aggressively; if a manual curl pull surfaces `session.token.rotate`, re-export cookies before continuing.
+- `https://yardstick.mozilla.org` is behind Google IAP. Every command that
+  hits `http://localhost:3000` requires `mzcld iap` running locally.
+- `gcx dashboards search --folder <name>` returns empty against
+  Yardstick's nested-folder layout. Use `/api/search?folderUIDs=<UID>`
+  (which is what `make discover-uids` does).
+- gcx splits dashboards across multiple API versions (`v0alpha1`,
+  `v1beta1`). Both directories under `yardstick/resources/` are real;
+  don't delete one assuming it is stale.
+- Yardstick rotates session tokens aggressively; service-account tokens
+  via the IAP proxy are the supported path, not browser cookies.
