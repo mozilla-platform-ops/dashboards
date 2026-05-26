@@ -1,5 +1,6 @@
 BASE_URL ?= http://localhost:3000
 TOKEN_REF ?= op://RelOps/Grafana Yardstick Service Account Token/credential
+CONTEXT ?= yardstick
 
 export BASE_URL
 export TOKEN_REF
@@ -33,9 +34,10 @@ comma := ,
 FOLDER_CSV := $(subst $(space),$(comma),$(strip $(FOLDER_UIDS)))
 DASHBOARD_CSV := $(subst $(space),$(comma),$(strip $(DASHBOARD_UIDS)))
 
-.PHONY: help backup push validate diff check-proxy discover-uids
+.PHONY: help login backup push validate diff check-proxy discover-uids
 
 help:
+	@echo "make login           one-time gcx login against the local IAP proxy (token from 1Password)"
 	@echo "make backup          pull RelSRE dashboards/folders via gcx and alert rules via /api/v1/provisioning"
 	@echo "make push            gcx resources push -p resources (dashboards/folders only)"
 	@echo "make validate        gcx resources validate -p resources"
@@ -48,6 +50,12 @@ check-proxy:
 	  echo "Start it with: mzcld iap --host yardstick.mozilla.org --proxy --port 3000"; \
 	  exit 1; \
 	}
+
+login: check-proxy
+	@token=$${GRAFANA_TOKEN:-$$(op read "$(TOKEN_REF)")}; \
+	gcx login $(CONTEXT) --server $(BASE_URL) --token "$$token" --yes
+	gcx config use-context $(CONTEXT)
+	gcx config check
 
 backup: check-proxy
 	gcx resources pull dashboards/$(DASHBOARD_CSV) folders/$(FOLDER_CSV) -p resources -o yaml

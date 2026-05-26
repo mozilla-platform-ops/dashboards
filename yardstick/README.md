@@ -48,6 +48,9 @@ install + auth flow. In short:
 ```bash
 make help            # list targets
 
+# one-time: log gcx in against the local IAP proxy (token from 1Password)
+make login
+
 # back up live state into resources/ + alerts/
 make backup
 
@@ -66,11 +69,13 @@ make discover-uids
 
 Environment overrides:
 - `BASE_URL` — defaults to `http://localhost:3000`
-- `TOKEN_REF` — 1Password reference used by `pull_alerts.py` and
-  `discover-uids` (defaults to
+- `TOKEN_REF` — 1Password reference used by `make login`,
+  `pull_alerts.py`, and `discover-uids` (defaults to
   `op://RelOps/Grafana Yardstick Service Account Token/credential`)
-- `GRAFANA_TOKEN` — if set, scripts use it directly and skip `op read`.
-  See *Credential persistence* below.
+- `CONTEXT` — gcx context name written by `make login` (defaults to
+  `yardstick`)
+- `GRAFANA_TOKEN` — if set, scripts and `make login` use it directly and
+  skip `op read`. See *Credential persistence* below.
 
 ## Credential persistence
 
