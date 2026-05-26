@@ -1,0 +1,164 @@
+{
+  "annotations": {
+    "__dashboardUid__": "xqkIk8HZz",
+    "__panelId__": "13"
+  },
+  "condition": "D",
+  "data": [
+    {
+      "datasourceUid": "adpvtjmrxoc1sb",
+      "model": {
+        "adhocFilters": [],
+        "datasource": {
+          "type": "prometheus",
+          "uid": "adpvtjmrxoc1sb"
+        },
+        "disableTextWrap": false,
+        "editorMode": "code",
+        "expr": "sum by() (tc_queue2_prometheus_quarantined_workers{provisioner=\"proj-autophone\"})",
+        "fullMetaSearch": false,
+        "includeNullMetadata": true,
+        "interval": "",
+        "intervalMs": 30000,
+        "legendFormat": "total quarantined workers",
+        "maxDataPoints": 43200,
+        "range": true,
+        "refId": "B",
+        "useBackend": false
+      },
+      "queryType": "",
+      "refId": "B",
+      "relativeTimeRange": {
+        "from": 172800,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "adpvtjmrxoc1sb",
+      "model": {
+        "adhocFilters": [],
+        "datasource": {
+          "type": "prometheus",
+          "uid": "adpvtjmrxoc1sb"
+        },
+        "disableTextWrap": false,
+        "editorMode": "code",
+        "expr": "sum by(workerType) (tc_queue2_prometheus_quarantined_workers{provisioner=\"proj-autophone\"})",
+        "fullMetaSearch": false,
+        "includeNullMetadata": true,
+        "interval": "",
+        "intervalMs": 30000,
+        "legendFormat": "{{workerType}} quarantined workers",
+        "maxDataPoints": 43200,
+        "range": true,
+        "refId": "A",
+        "useBackend": false
+      },
+      "queryType": "",
+      "refId": "A",
+      "relativeTimeRange": {
+        "from": 172800,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "C"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "B",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "reducer": "last",
+        "refId": "C",
+        "type": "reduce"
+      },
+      "queryType": "",
+      "refId": "C",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                10
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "D"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "C",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "refId": "D",
+        "type": "threshold"
+      },
+      "queryType": "",
+      "refId": "D",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    }
+  ],
+  "execErrState": "Error",
+  "folderUID": "edtgaia1z6waoe",
+  "for": "1m",
+  "isPaused": false,
+  "keep_firing_for": "0s",
+  "noDataState": "NoData",
+  "notification_settings": {
+    "receiver": "Release SRE - PD - Android Hardware TC Queues - Low Priority"
+  },
+  "orgID": 1,
+  "record": null,
+  "ruleGroup": "1m",
+  "title": "Android Hw - Quarantined Workers - Alert",
+  "uid": "aee5svu78bh8gb"
+}

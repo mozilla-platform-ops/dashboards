@@ -1,0 +1,157 @@
+{
+  "annotations": {
+    "__dashboardUid__": "_N4y0LpWk",
+    "__panelId__": "13"
+  },
+  "condition": "D",
+  "data": [
+    {
+      "datasourceUid": "adpvtjmrxoc1sb",
+      "model": {
+        "adhocFilters": [],
+        "datasource": {
+          "type": "prometheus",
+          "uid": "adpvtjmrxoc1sb"
+        },
+        "editorMode": "code",
+        "expr": "sum by () (tc_queue2_prometheus_pending_tasks{provisioner=\"gecko-t\", workerType=~\".*kvm.*\"})",
+        "interval": "",
+        "intervalMs": 30000,
+        "legendFormat": "android-em total pending tasks",
+        "maxDataPoints": 43200,
+        "range": true,
+        "refId": "A"
+      },
+      "queryType": "",
+      "refId": "A",
+      "relativeTimeRange": {
+        "from": 86400,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "adpvtjmrxoc1sb",
+      "model": {
+        "adhocFilters": [],
+        "datasource": {
+          "type": "prometheus",
+          "uid": "adpvtjmrxoc1sb"
+        },
+        "editorMode": "code",
+        "expr": "tc_queue2_prometheus_pending_tasks{provisioner=\"gecko-t\", workerType=~\".*kvm.*\"}",
+        "instant": false,
+        "interval": "",
+        "intervalMs": 30000,
+        "legendFormat": "{{provisioner}}/{{workerType}} jobs",
+        "maxDataPoints": 43200,
+        "range": true,
+        "refId": "B"
+      },
+      "queryType": "",
+      "refId": "B",
+      "relativeTimeRange": {
+        "from": 86400,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "C"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "A",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "reducer": "last",
+        "refId": "C",
+        "type": "reduce"
+      },
+      "queryType": "",
+      "refId": "C",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                7000
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "D"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "C",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "refId": "D",
+        "type": "threshold"
+      },
+      "queryType": "",
+      "refId": "D",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    }
+  ],
+  "execErrState": "Error",
+  "folderUID": "edtgaia1z6waoe",
+  "for": "1m",
+  "isPaused": false,
+  "keep_firing_for": "0s",
+  "noDataState": "NoData",
+  "notification_settings": {
+    "receiver": "Release SRE - PD - Android Hardware TC Queues - Low Priority"
+  },
+  "orgID": 1,
+  "record": null,
+  "ruleGroup": "1m",
+  "title": "Android Em - Pending Tasks - Alert",
+  "uid": "fee5rupdkljwge"
+}
