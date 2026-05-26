@@ -22,18 +22,57 @@ workflow against Yardstick.
 ad-hoc inspection of Yardstick dashboards, alert rules, and datasources
 without exporting browser cookies or running Docker.
 
-### install
+Mozilla's full guide is in the SRE Confluence:
+[How to: Use Grafana with Claude Code, Grafana MCP, and Grafana gcx](https://mozilla-hub.atlassian.net/wiki/spaces/SRE/pages/2641985695/How+to+Use+Grafana+with+Claude+Code+Grafana+MCP+and+Grafana+gcx).
+
+### prerequisites
+
+1. A Grafana service-account token for Yardstick, stored in 1Password.
+   Request one via the [SRE Infrastructure form](https://mozilla-hub.atlassian.net/jira/software/c/projects/SREIN/form/1344)
+   (Editor role, name like `firstname-lastname-claude`). Detailed steps:
+   [How to: Create and manage Yardstick accounts and access](https://mozilla-hub.atlassian.net/wiki/spaces/SRE/pages/1695350962).
+2. `gcloud` authenticated (`gcloud auth login`) — `mzcld` uses it to mint
+   Google IAP tokens.
+3. The 1Password CLI (`op`).
+
+### install gcx
 
 ```bash
 brew install grafana/grafana/gcx
 ```
 
-### authenticate against Yardstick
+### install mzcld (IAP proxy for Yardstick)
 
-Yardstick at `https://yardstick.mozilla.org` is behind SSO and rejects
-service-account tokens directly. Authenticate against the local proxy on
-`http://localhost:3000` instead, using the service-account token stored in
-1Password as `Grafana Yardstick Service Account Token` (RelOps vault):
+`https://yardstick.mozilla.org` is protected by Google IAP, so `gcx` and the
+Grafana MCP cannot talk to it directly. [`mzcld`](https://github.com/mozilla/mozcloud/tree/main/tools/mzcld)
+runs a local proxy on `http://localhost:3000` that injects and refreshes the
+IAP token automatically.
+
+```bash
+go install github.com/mozilla/mozcloud/tools/mzcld@latest
+```
+
+### start the proxy
+
+Leave this running in a separate terminal while you use `gcx`:
+
+```bash
+mzcld iap --host yardstick.mozilla.org --proxy --port 3000
+```
+
+Verify:
+
+```bash
+curl -s http://localhost:3000/api/health | jq .
+# { "database": "ok", "version": "12.x.x", ... }
+```
+
+### authenticate gcx against Yardstick
+
+With the proxy running, authenticate `gcx` against `http://localhost:3000`
+using the service-account token stored in 1Password (default item name:
+`Grafana Yardstick Service Account Token` in the RelOps vault — adjust the
+`op://` path to match your own item):
 
 ```bash
 gcx login yardstick \

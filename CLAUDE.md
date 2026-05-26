@@ -21,7 +21,7 @@ A version-controlled backup of Mozilla RelSRE Grafana dashboards (and the alert 
 Three working methods, in preference order:
 
 1. **GDG (preferred when set up):** drop the 1Password `importer.yml` into `yardstick/gdg-based/config/`, then `./run_gdg.sh backup dash download -f RelSRE`. Copy GDG's output into the tracked directories above before committing.
-2. **gcx via local Yardstick proxy:** see the top-level `README.md` `gcx` section. Auth uses the 1Password item `op://RelOps/Grafana Yardstick Service Account Token` against `http://localhost:3000`. Direct `https://yardstick.mozilla.org` is behind SSO and rejects service-account tokens.
+2. **gcx via local Yardstick proxy:** see the top-level `README.md` `gcx` section. Auth uses the 1Password item `op://RelOps/Grafana Yardstick Service Account Token` against `http://localhost:3000`. The proxy itself is `mzcld iap --host yardstick.mozilla.org --proxy --port 3000` ([mzcld](https://github.com/mozilla/mozcloud/tree/main/tools/mzcld)) — it must be running for any `localhost:3000` call (including the raw curl fallback) to work, since Yardstick is behind Google IAP and rejects service-account tokens directly.
 3. **Raw curl fallback:** Netscape-format cookies from `yardstick.mozilla.org` + `/api/search?folderUIDs=<UID>` and `/api/dashboards/uid/<UID>`. See `yardstick/gdg-based/README.md` for exact commands.
 
 ## Hard rules for backup/update PRs
