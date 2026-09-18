@@ -353,7 +353,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum by(provisionerId, workerType) (increase(fxci_queue_exception_tasks{provisionerId=~\"$provisioner\", workerType=~\"$workerType\", workerType!~\".*gcp.*\"}[15m]))",
+          "expr": "sum by(provisionerId, workerType) (increase(fxci_queue_exception_tasks{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\", workerType!~\".*gcp.*\"}[15m]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -368,7 +368,7 @@
             "uid": "adpvtjmrxoc1sb"
           },
           "editorMode": "code",
-          "expr": "sum by(provisionerId, workerType) (increase(fxci_queue_completed_tasks{provisionerId=~\"$provisioner\", workerType=~\"$workerType\", workerType!~\".*gcp.*\"}[15m]))",
+          "expr": "sum by(provisionerId, workerType) (increase(fxci_queue_completed_tasks{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\", workerType!~\".*gcp.*\"}[15m]))",
           "hide": false,
           "instant": false,
           "legendFormat": "{{provisionerId}}/{{workerType}} completed",
@@ -513,7 +513,7 @@
                 "value": [
                   {
                     "title": "filter by provisioner and workerType",
-                    "url": "/d/${__dashboard.uid}﻿/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=${__data.fields.workerType}"
+                    "url": "/d/${__dashboard.uid}/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=${__data.fields.workerType}"
                   }
                 ]
               }
@@ -534,7 +534,7 @@
                 "value": [
                   {
                     "title": "filter by provisioner",
-                    "url": "/d/${__dashboard.uid}﻿/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=All"
+                    "url": "/d/${__dashboard.uid}/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=All"
                   }
                 ]
               }
@@ -588,7 +588,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_pending_tasks{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
+          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_pending_tasks{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
           "format": "table",
           "fullMetaSearch": false,
           "hide": false,
@@ -607,7 +607,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_running_workers{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
+          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_running_workers{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
           "format": "table",
           "fullMetaSearch": false,
           "hide": false,
@@ -626,7 +626,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "(sum by(provisioner, workerType) (label_replace(fxci_queue_quarantined_workers{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\")) / sum by(provisioner, workerType) (label_replace(fxci_queue_workers_total{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\")) * 100)",
+          "expr": "(sum by(provisioner, workerType) (label_replace(fxci_queue_quarantined_workers{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\")) / sum by(provisioner, workerType) (label_replace(fxci_queue_workers_total{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\")) * 100)",
           "format": "table",
           "fullMetaSearch": false,
           "hide": true,
@@ -644,7 +644,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_quarantined_workers{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
+          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_quarantined_workers{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
           "format": "table",
           "hide": true,
           "instant": true,
@@ -659,7 +659,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_workers_total{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
+          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_workers_total{provisionerId!~\"^(releng-hardware|proj-autophone|scriptworker-prov-v1)\", provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
           "format": "table",
           "hide": true,
           "instant": true,
@@ -916,7 +916,7 @@
             "uid": "adpvtjmrxoc1sb"
           },
           "editorMode": "code",
-          "expr": "sum by(workerType, provisionerId) (avg_over_time(fxci_queue_pending_tasks{provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[15m]) / avg_over_time(fxci_queue_running_workers{provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[15m]))",
+          "expr": "sum by(workerType, provisionerId) (avg_over_time(fxci_queue_pending_tasks{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[15m]) / avg_over_time(fxci_queue_running_workers{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[15m]))",
           "hide": false,
           "instant": false,
           "interval": "5m",
@@ -1272,7 +1272,7 @@
             "uid": "adpvtjmrxoc1sb"
           },
           "editorMode": "code",
-          "expr": "sum by(provisionerId, workerType) (\n  avg_over_time(fxci_queue_running_workers{\n    provisionerId!~\"^gecko.*\",\n    provisionerId!~\".*k8s\",\n    provisionerId=~\"$provisioner\",\n    workerType=~\"$workerType\",\n  }[$__interval])\n) ",
+          "expr": "sum by(provisionerId, workerType) (\n  avg_over_time(fxci_queue_running_workers{\n    provisionerId!~\"^gecko.*\",\n    provisionerId!~\".*k8s\",\n    provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\",\n    workerType=~\"$workerType\",\n  }[$__interval])\n) ",
           "hide": false,
           "interval": "5m",
           "intervalFactor": 1,
@@ -1286,7 +1286,7 @@
             "uid": "adpvtjmrxoc1sb"
           },
           "editorMode": "code",
-          "expr": "sum by(provisionerId, workerType) (\n  avg_over_time(fxci_queue_workers_total{\n    provisionerId!~\"^gecko.*\",\n    provisionerId!~\".*k8s\",\n    provisionerId=~\"$provisioner\",\n    workerType=~\"$workerType\",\n  }[$__interval])\n  - \n  avg_over_time(fxci_queue_quarantined_workers{\n    provisionerId!~\"^gecko.*\",\n    provisionerId!~\".*k8s\",\n    provisionerId=~\"$provisioner\",\n    workerType=~\"$workerType\",\n  }[$__interval])\n) ",
+          "expr": "sum by(provisionerId, workerType) (\n  avg_over_time(fxci_queue_workers_total{\n    provisionerId!~\"^gecko.*\",\n    provisionerId!~\".*k8s\",\n    provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\",\n    workerType=~\"$workerType\",\n  }[$__interval])\n  - \n  avg_over_time(fxci_queue_quarantined_workers{\n    provisionerId!~\"^gecko.*\",\n    provisionerId!~\".*k8s\",\n    provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\",\n    workerType=~\"$workerType\",\n  }[$__interval])\n) ",
           "hide": false,
           "instant": false,
           "interval": "5m",
@@ -1301,7 +1301,7 @@
             "uid": "adpvtjmrxoc1sb"
           },
           "editorMode": "code",
-          "expr": "sum by(provisionerId, workerType) (\n  avg_over_time(fxci_queue_quarantined_workers{\n    provisionerId!~\"^gecko.*\",\n    provisionerId!~\"k8s\",\n    provisionerId=~\"$provisioner\",\n    workerType=~\"$workerType\",\n  }[$__interval])\n) ",
+          "expr": "sum by(provisionerId, workerType) (\n  avg_over_time(fxci_queue_quarantined_workers{\n    provisionerId!~\"^gecko.*\",\n    provisionerId!~\"k8s\",\n    provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\",\n    workerType=~\"$workerType\",\n  }[$__interval])\n) ",
           "hide": false,
           "instant": false,
           "interval": "5m",
@@ -1688,7 +1688,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "avg by(workerType, provisionerId) (fxci_queue_pending_tasks{provisionerId=~\"$provisioner\", workerType=~\"$workerType\"})",
+          "expr": "avg by(workerType, provisionerId) (fxci_queue_pending_tasks{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"})",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -1763,7 +1763,7 @@
                 "value": [
                   {
                     "title": "filter by provisioner",
-                    "url": "/d/${__dashboard.uid}﻿/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=All"
+                    "url": "/d/${__dashboard.uid}/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=All"
                   }
                 ]
               }
@@ -1791,7 +1791,7 @@
                 "value": [
                   {
                     "title": "filter by provisioner and workerType",
-                    "url": "/d/${__dashboard.uid}﻿/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=${__data.fields.workerType}"
+                    "url": "/d/${__dashboard.uid}/${__dashboard}?var-provisioner=${__data.fields.provisioner}&var-workerType=${__data.fields.workerType}"
                   }
                 ]
               }
@@ -1947,7 +1947,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_pending_tasks{provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
+          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_pending_tasks{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
           "format": "table",
           "fullMetaSearch": false,
           "hide": false,
@@ -1966,7 +1966,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_running_workers{provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
+          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_running_workers{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
           "format": "table",
           "fullMetaSearch": false,
           "hide": false,
@@ -1985,7 +1985,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_idle_workers{provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
+          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_idle_workers{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
           "format": "table",
           "fullMetaSearch": false,
           "hide": false,
@@ -2003,7 +2003,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_workers_total{provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
+          "expr": "sum by(provisioner, workerType) (label_replace(fxci_queue_workers_total{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\"))",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -2018,7 +2018,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "(sum by(provisioner, workerType) (label_replace(fxci_queue_quarantined_workers{provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\")) / sum by(provisioner, workerType) (label_replace(fxci_queue_workers_total{provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\")) * 100)",
+          "expr": "(sum by(provisioner, workerType) (label_replace(fxci_queue_quarantined_workers{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\")) / sum by(provisioner, workerType) (label_replace(fxci_queue_workers_total{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\", provisionerId=~\"^(releng-hardware|bitbar|proj-autophone)$\"}, \"provisioner\", \"$1\", \"provisionerId\", \"(.*)\")) * 100)",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -2385,7 +2385,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "avg_over_time(fxci_queue_running_workers{provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[10m])",
+          "expr": "avg_over_time(fxci_queue_running_workers{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[10m])",
           "instant": false,
           "interval": "5m",
           "intervalFactor": 1,
@@ -2399,7 +2399,7 @@
             "uid": "adpvtjmrxoc1sb"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(fxci_queue_pending_tasks{provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[1m])",
+          "expr": "avg_over_time(fxci_queue_pending_tasks{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[1m])",
           "hide": false,
           "instant": false,
           "interval": "5m",
@@ -2711,7 +2711,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "avg_over_time(fxci_queue_running_workers{provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[10m])",
+          "expr": "avg_over_time(fxci_queue_running_workers{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[10m])",
           "instant": false,
           "interval": "5m",
           "intervalFactor": 1,
@@ -2725,7 +2725,7 @@
             "uid": "adpvtjmrxoc1sb"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(fxci_queue_pending_tasks{provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[1m])",
+          "expr": "avg_over_time(fxci_queue_pending_tasks{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\", workerType=~\"$workerType\"}[1m])",
           "hide": false,
           "instant": false,
           "interval": "5m",
@@ -2761,14 +2761,14 @@
           "type": "prometheus",
           "uid": "adpvtjmrxoc1sb"
         },
-        "definition": "label_values(fxci_queue_pending_tasks, provisionerId)",
+        "definition": "label_values(fxci_queue_pending_tasks{provisionerId!=\"test-provisioner\"}, provisionerId)",
         "includeAll": true,
         "multi": true,
         "name": "provisioner",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(fxci_queue_pending_tasks, provisionerId)",
+          "query": "label_values(fxci_queue_pending_tasks{provisionerId!=\"test-provisioner\"}, provisionerId)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -2786,14 +2786,14 @@
           "type": "prometheus",
           "uid": "adpvtjmrxoc1sb"
         },
-        "definition": "label_values(fxci_queue_pending_tasks{provisionerId=~\"$provisioner\"}, workerType)",
+        "definition": "label_values(fxci_queue_pending_tasks{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\"}, workerType)",
         "includeAll": true,
         "multi": true,
         "name": "workerType",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(fxci_queue_pending_tasks{provisionerId=~\"$provisioner\"}, workerType)",
+          "query": "label_values(fxci_queue_pending_tasks{provisionerId!=\"test-provisioner\", provisionerId=~\"$provisioner\"}, workerType)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
