@@ -1,0 +1,90 @@
+{
+  "annotations": {
+    "description": "Queue {{ index $labels \"workerPoolId\" }} has {{ $values.A.Value }} pending task(s), but worker-manager has no worker pool for it. Add the pool in mozilla-releng/fxci-config worker-pools.yml.",
+    "summary": "queue with pending tasks and no worker pool: {{ index $labels \"workerPoolId\" }}"
+  },
+  "condition": "C",
+  "data": [
+    {
+      "datasourceUid": "adpvtjmrxoc1sb",
+      "model": {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "adpvtjmrxoc1sb"
+        },
+        "editorMode": "code",
+        "expr": "# Alert: Pending Tasks Without a Worker Pool\n# OWNER: relops\n#\n# This alert detects task queues that have pending tasks but no worker pool\n# in worker-manager. No worker will ever claim these tasks. They wait until\n# their deadline and then fail with deadline-exceeded.\n#\n# Example: enterprise-3/b-win2025-gpu (fxci-config#1427) and\n# enterprise-{1,3}/b-linux-kvm. Each had 1-7 pending tasks, which is below\n# the \">= 10\" threshold of \"queues with 1+ tasks and no running workers\".\n#\n# How it works:\n# 1. `sum by (provisionerId, workerType) (fxci_queue_pending_tasks) > 0`\n#    - Selects queues with one or more pending tasks. No count threshold:\n#      one stuck task is a problem when no pool exists.\n#    - label_join builds workerPoolId = \"<provisionerId>/<workerType>\".\n# 2. `max_over_time(fxci_worker_manager_desired_capacity[1h])`\n#    - worker-manager emits this metric for each pool that it knows.\n#      The 1h lookback ignores short scrape gaps.\n# 3. `A unless on (workerPoolId) B`\n#    - Returns only the queues that have no worker pool.\n#\n# Filters (provisioners that are not managed by worker-manager):\n# - releng-hardware, proj-autophone (hardware workers)\n# - scriptworker-k8s, scriptworker-prov-v1 (scriptworkers)\n# - test-provisioner, built-in (Taskcluster internal)\n#\n# Fix: add the missing pool in mozilla-releng/fxci-config worker-pools.yml,\n# or fix the taskQueueId of the task.\n#\nlabel_join(\n  sum by (provisionerId, workerType)\n    (fxci_queue_pending_tasks{provisionerId!~\"releng-hardware|proj-autophone|scriptworker-k8s|scriptworker-prov-v1|test-provisioner|built-in\"}) > 0,\n  \"workerPoolId\", \"/\", \"provisionerId\", \"workerType\"\n)\nunless on (workerPoolId)\nmax by (workerPoolId)\n  (max_over_time(fxci_worker_manager_desired_capacity[1h]))\n",
+        "format": "time_series",
+        "instant": true,
+        "intervalMs": 1000,
+        "legendFormat": "{{workerPoolId}}",
+        "maxDataPoints": 43200,
+        "range": false,
+        "refId": "A"
+      },
+      "queryType": "",
+      "refId": "A",
+      "relativeTimeRange": {
+        "from": 600,
+        "to": 0
+      }
+    },
+    {
+      "datasourceUid": "__expr__",
+      "model": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0,
+                0
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": []
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "datasource": {
+          "name": "Expression",
+          "type": "__expr__",
+          "uid": "__expr__"
+        },
+        "expression": "A",
+        "intervalMs": 1000,
+        "maxDataPoints": 43200,
+        "refId": "C",
+        "type": "threshold"
+      },
+      "queryType": "",
+      "refId": "C",
+      "relativeTimeRange": {
+        "from": 0,
+        "to": 0
+      }
+    }
+  ],
+  "execErrState": "Alerting",
+  "folderUID": "edtgaia1z6waoe",
+  "for": "1h",
+  "isPaused": false,
+  "keep_firing_for": "0s",
+  "noDataState": "OK",
+  "notification_settings": {
+    "receiver": "relops - slack tf"
+  },
+  "orgID": 1,
+  "record": null,
+  "ruleGroup": "1m",
+  "title": "queues with pending tasks and no worker pool",
+  "uid": "relops-queue-no-worker-pool"
+}
